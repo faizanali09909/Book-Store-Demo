@@ -1,4 +1,3 @@
-
 from crewai import Agent, Task, Crew, LLM
 import streamlit as st
 from dotenv import load_dotenv
@@ -6,11 +5,16 @@ import os
 
 load_dotenv()
 
-llm = LLM(model="groq/llama-3.1-8b-instant", api_key=os.getenv("GROQ_API_KEY"))
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
+llm = LLM(model="groq/llama-3.1-8b-instant", api_key=GROQ_API_KEY)
 
 st.set_page_config(page_title="Al-Hashim Book Store — Assistant", initial_sidebar_state="collapsed")
 
 st.title("Al-Hashim Book Store — Ask Our Assistant")
+
+if not GROQ_API_KEY:
+    st.error("GROQ_API_KEY is missing. Add it in Streamlit Cloud → Manage app → Settings → Secrets.")
 
 if "stock" not in st.session_state:
     st.session_state.stock = []
@@ -43,8 +47,11 @@ else:
 
     if st.button("Ask") and question:
         with st.spinner("Checking..."):
-            result = assistant_crew.kickoff(inputs={
-                "inventory": item_list_text,
-                "question": question
-            })
-        st.write(result.raw)
+            try:
+                result = assistant_crew.kickoff(inputs={
+                    "inventory": item_list_text,
+                    "question": question
+                })
+                st.write(result.raw)
+            except Exception as e:
+                st.error(f"Something went wrong: {e}")
