@@ -5,11 +5,16 @@ import os
 
 load_dotenv()
 
-llm = LLM(model="groq/llama-3.1-8b-instant", api_key=os.getenv("GROQ_API_KEY"))
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
+llm = LLM(model="groq/llama-3.1-8b-instant", api_key=GROQ_API_KEY)
 
 st.set_page_config(page_title="Al-Hashim Book Store — Owner Panel")
 
 st.title("Al-Hashim Book Store — Owner Panel")
+
+if not GROQ_API_KEY:
+    st.error("GROQ_API_KEY is missing. Add it in Streamlit Cloud → Manage app → Settings → Secrets.")
 
 if "owner_account" not in st.session_state:
     st.session_state.owner_account = None  # {"username":..., "password":...}
